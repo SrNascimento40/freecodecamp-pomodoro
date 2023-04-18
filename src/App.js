@@ -40,8 +40,9 @@ function App() {
         </div>
       </div>
       <div id="display">
-        <h2>{sessionTime}:00</h2>
-        <button onClick={() => setStart(!start)}>{start ? "Start" : "Stop"}</button>
+        <h2 id="time-left">{sessionTime}:00</h2>
+        <button id="start_stop" onClick={() => setStart(!start)}>{start ? "Start" : "Stop"}</button>
+        <button id="reset" onClick={() => setSessionTime(25)}>Reset</button>
       </div>
     </body>
   );
