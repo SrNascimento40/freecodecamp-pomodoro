@@ -11,3 +11,18 @@ body {
   justify-content: center;
   gap: 1rem;
 }
+
+#display {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+}
+
+#time-left {
+  align-self: center;
+}
+
+.controlPomo {
+  margin: 0.25rem 0rem;
+  padding: 0.5rem 1.5rem;
+}
