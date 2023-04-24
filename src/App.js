@@ -1,5 +1,11 @@
 import React, { useState } from "react";
 import "./App.css";
+import audio from "./scream.mp3";
+
+function playScream() {
+  const audioElement = new Audio(audio);
+  audioElement.play();
+}
 
 function App() {
   const [breakTime, setBreakTime] = useState(5 * 60);
@@ -49,31 +55,48 @@ function App() {
   }
 
   function resetTimer() {
-    if (start) {
-      setDisplayTime(sessionTime);
-      setStart(false);
-    } else {
-      setSessionTime(25 * 60);
-      setDisplayTime(25 * 60);
-      setBreakTime(5 * 60);
-    }
+    setSessionTime(25 * 60);
+    setDisplayTime(25 * 60);
+    setBreakTime(5 * 60);
   }
 
   function controlTime() {
+    let second = 1000;
+    let date = new Date().getTime();
+    let nextDate = new Date().getTime() + second;
+    let onPauseVariable = pause;
+
+    if (!start) {
+      let interval = setInterval(() => {
+        date = new Date().getTime();
+        if (date > nextDate) {
+          setDisplayTime((prev) => {
+            if (prev <= 0 && !onPauseVariable) {
+              playScream();
+              onPauseVariable = true;
+              setPause(true);
+              return breakTime;
+            } else if (prev <= 0 && onPauseVariable) {
+              playScream();
+              onPauseVariable = false;
+              setPause(false);
+              return sessionTime;
+            }
+
+            return prev - 1;
+          });
+          nextDate += second;
+        }
+      }, 30);
+      localStorage.clear();
+      localStorage.setItem("interval-id", interval);
+    }
+
+    if (start) {
+      clearInterval(localStorage.getItem("interval-id"));
+    }
+
     setStart(!start);
-    console.log("banana 1");
-    if (displayTime <= 0 && start) {
-      console.log("banana 2");
-      setStart(false);
-      setPause(true);
-      setDisplayTime(breakTime);
-    }
-    if (displayTime <= 0 && pause) {
-      console.log("banana 3");
-      setStart(true);
-      setPause(false);
-      setDisplayTime(sessionTime);
-    }
   }
 
   return (
@@ -102,6 +125,7 @@ function App() {
         </div>
       </div>
       <div id="display">
+        <h4>{pause ? "Break time" : "Focous time!"}</h4>
         <h2 id="time-left">{formatTime(displayTime)}</h2>
         <button
           className="controlPomo"
