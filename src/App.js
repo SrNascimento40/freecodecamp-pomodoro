@@ -15,32 +15,36 @@ function App() {
   const [pause, setPause] = useState(false);
 
   function increaseBreakTime() {
-    setBreakTime(breakTime + 10);
+    if (breakTime >= (60*60)) {
+      return;
+    }
+    setBreakTime(breakTime + 60);
   }
 
   function decreaseBreakTime() {
-    if (breakTime < 5) {
-      alert("tempo mínimo atingido!");
+    if (breakTime < 65) {
       return;
     }
-    setBreakTime(breakTime - 10);
+    setBreakTime(breakTime - 60);
   }
 
   function increaseSessionTime() {
-    setSessionTime(sessionTime + 10);
+    if (sessionTime >= (60*60)) {
+      return;
+    }
+    setSessionTime(sessionTime + 60);
     if (!start) {
-      setDisplayTime(sessionTime + 10);
+      setDisplayTime(sessionTime + 60);
     }
   }
 
   function decreaseSessionTime() {
-    if (sessionTime < 5) {
-      alert("tempo mínimo atingido!");
+    if (sessionTime < 65) {
       return;
     }
-    setSessionTime(sessionTime - 10);
+    setSessionTime(sessionTime - 60);
     if (!start) {
-      setDisplayTime(sessionTime - 10);
+      setDisplayTime(sessionTime - 60);
     }
   }
 
@@ -58,27 +62,28 @@ function App() {
     setSessionTime(25 * 60);
     setDisplayTime(25 * 60);
     setBreakTime(5 * 60);
+    setStart(false);
+    clearInterval(localStorage.getItem("interval-id"));
+    setPause(false);
   }
 
   function controlTime() {
     let second = 1000;
     let date = new Date().getTime();
     let nextDate = new Date().getTime() + second;
-    let onPauseVariable = pause;
 
     if (!start) {
       let interval = setInterval(() => {
         date = new Date().getTime();
+
         if (date > nextDate) {
           setDisplayTime((prev) => {
-            if (prev <= 0 && !onPauseVariable) {
+            if (prev <= 0 && !pause) {
               playScream();
-              onPauseVariable = true;
               setPause(true);
               return breakTime;
-            } else if (prev <= 0 && onPauseVariable) {
+            } else if (prev <= 0 && pause) {
               playScream();
-              onPauseVariable = false;
               setPause(false);
               return sessionTime;
             }
@@ -108,7 +113,7 @@ function App() {
           <button onClick={() => decreaseSessionTime()} id="session-decrement">
             -
           </button>
-          <div id="session-length">{formatTime(sessionTime)}</div>
+          <div id="session-length">{sessionTime / 60}</div>
           <button onClick={() => increaseSessionTime()} id="session-increment">
             +
           </button>
@@ -118,14 +123,14 @@ function App() {
           <button onClick={() => decreaseBreakTime()} id="break-decrement">
             -
           </button>
-          <div id="break-length">{formatTime(breakTime)}</div>
+          <div id="break-length">{breakTime / 60}</div>
           <button onClick={() => increaseBreakTime()} id="break-increment">
             +
           </button>
         </div>
       </div>
       <div id="display">
-        <h4>{pause ? "Break time" : "Focous time!"}</h4>
+        <h4 id="timer-label">{pause ? "Break" : "Session"}</h4>
         <h2 id="time-left">{formatTime(displayTime)}</h2>
         <button
           className="controlPomo"
